@@ -46,9 +46,12 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\EnemyControl.cs" />
+     <Compile Include="Assets\GlobalVariables.cs" />
      <Compile Include="Assets\PlayerControl.cs" />
      <Compile Include="Assets\PreludeControl.cs" />
      <Compile Include="Assets\PuzzleButtonControl.cs" />
+     <Compile Include="Assets\ReachGameEndingDenoter.cs" />
      <Compile Include="Assets\TitleControl.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/4.6.0/UnityEngine.UI.dll</HintPath>
