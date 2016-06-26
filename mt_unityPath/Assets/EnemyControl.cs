@@ -36,6 +36,11 @@ public class EnemyControl : MonoBehaviour {
 	bool isMovingToPlayer = false;
 	bool isMovingFromPlayer = false;
 
+	bool isCloseToPlayer = false;
+	bool isVeryFarFromPlayer = false;
+
+	bool isEnemyAttacking = false;
+
 
 	void Start () {
 		enemySR = this.GetComponent ("SpriteRenderer") as SpriteRenderer;
@@ -43,9 +48,43 @@ public class EnemyControl : MonoBehaviour {
 
 	void Update () {
 
+		// return if the current theme is colorful instead of black-and-white
 		if (!GlobalVariables.isBlackNWhite)
 			return;
 
+
+		/// <summary>X difference between player and enemy</summary>
+		float differX = playerT.position.x - this.transform.position.x;
+		Debug.Log("differX = " + differX);
+		if (differX <= 1f && differX >= -1f) 
+		{
+			isCloseToPlayer = true;
+		}
+		else 
+		{
+			isCloseToPlayer = false;
+		}
+		Debug.Log("isCloseToPlayer=" + isCloseToPlayer);
+//		if(differX >= 6 || differX <= -6)
+//		{
+//			isVeryFarFromPlayer = true;
+//		}
+//		else 
+//		{
+//			isVeryFarFromPlayer = false;
+//		}
+		/// <remarks>isCloseToPlayer and isVeryFarFromPlayer exclude each other</remarks>
+//		if(isCloseToPlayer)
+//		{
+//			isVeryFarFromPlayer = false;
+//		}
+//		if(isVeryFarFromPlayer)
+//		{
+//			isCloseToPlayer = false;
+//		}
+
+
+		/// <summary>facing directions</summary>
 		// always facing the player's direction
 		if (this.transform.position.x > playerT.position.x) 
 		{
@@ -69,51 +108,42 @@ public class EnemyControl : MonoBehaviour {
 			this.transform.Rotate(new Vector3(0, 180, 0));
 			isChangingDir = false;
 		}
-		/*
-		if(++frameCounterDiceOpportunity >= DICE_TIME)
+
+
+		// if enough health, move to player and attack when they're close
+		if (health > DEFEND_THRESHOLD 
+		    && !isEnemyAttacking
+		    && !isCloseToPlayer
+		    ) 
 		{
-			int randN = Random.Range (3, 6);
-
-			switch(randN)
-			{
-			case ENEMY_STATE_IDLE:
-				enemyStayIdle();
-				break;
-			case ENEMY_STATE_MOVE_TO_PLAYER:
-				enemyMoveToPlayer();
-				break;
-			case ENEMY_STATE_MOVE_FROM_PLAYER:
-				enemyMoveFromPlayer();
-				break;
-			}
-			frameCounterDiceOpportunity = 0;
-
-			frameActionSpriteSlack = 0;
-		}
-		*/
-
-		if (health > DEFEND_THRESHOLD) 
-		{
-			if(!isMovingToPlayer) isMovingToPlayer = true;
+			Debug.Log("isMovingToPlayer=" + isMovingToPlayer);
+			if(!isMovingToPlayer && !isCloseToPlayer) isMovingToPlayer = true;
+			else if(isMovingToPlayer && isCloseToPlayer) isMovingToPlayer = false;
 		}
 
+		// hold the attack/defend sprite for a while after returning to normal sprite
 		if (isActionSpriteSlack) 
 		{
 			if(++frameActionSpriteSlack >= 20)
 			{
 				enemySR.sprite = eNormalSprite;
 				isActionSpriteSlack = false;
+				frameActionSpriteSlack = 0;
+				isEnemyAttacking = false;
 			}
 		}
 
+		if(isCloseToPlayer && !isEnemyAttacking)
+		{
+			isMovingToPlayer = false;
+			enemyAttack();
+			Debug.Log ("Enemy attack");
+//			enemyMoveFromPlayer();
+		}
+
+
 		if (isMovingToPlayer) 
 		{
-			float differX = playerT.position.x - this.transform.position.x;
-			if(differX <= 0.3f || differX >= -0.3f)
-			{
-				isMovingToPlayer = false;
-				enemyAttack();
-			}
 
 			if(isFaceLeft)
 			{
@@ -124,13 +154,29 @@ public class EnemyControl : MonoBehaviour {
 				this.transform.position += new Vector3(3 * Time.deltaTime, 0, 0);
 			}
 		}
+//
+//		if(isMovingFromPlayer)
+//		{
+//			if(isVeryFarFromPlayer)
+//			{
+//				isMovingFromPlayer = false;
+//				enemyMoveToPlayer();
+//			}
+//
+//			if(isFaceLeft)
+//			{
+//				this.transform.position += new Vector3(3 * Time.deltaTime, 0, 0);
+//			}
+//			else 
+//			{
+//				this.transform.position -= new Vector3(3 * Time.deltaTime, 0, 0);
+//			}
+//		}
 
 		// if player is attacking and player is close to enemy
 		if (GlobalVariables.isPlayerAttacking) 
 		{
-			float differX = playerT.position.x - this.transform.position.x;
-
-			if(differX <= 0.3f || differX >= -0.3f)
+			if(isCloseToPlayer)
 			{
 				enemyDefend();
 			}
@@ -141,6 +187,7 @@ public class EnemyControl : MonoBehaviour {
 	{
 		enemySR.sprite = eAttackSprite;
 		isActionSpriteSlack = true;
+		isEnemyAttacking = true;
 	}
 
 	void enemyDefend()
