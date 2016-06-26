@@ -5,13 +5,14 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class PuzzleButtonControl : MonoBehaviour {
-	/*
+
 	public Transform puzzleTransform;
 
 	void Start () {
 		List<string> btnNames = new List<string> ();
-		btnNames.Add ("TurnLeft");
-		btnNames.Add ("TurnRight");
+		//btnNames.Add ("TurnLeft");
+		//btnNames.Add ("TurnRight");
+		btnNames.Add ("Skip");
 
 		foreach (string name in btnNames) 
 		{
@@ -38,7 +39,11 @@ public class PuzzleButtonControl : MonoBehaviour {
 		case "TurnRight":
 			Debug.Log ("button TurnRight pressed");
 			break;
+		case "Skip":
+			Debug.Log ("button Skip pressed");
+			Application.LoadLevel(3);
+			break;
 		}
 	}
-	*/
+
 }

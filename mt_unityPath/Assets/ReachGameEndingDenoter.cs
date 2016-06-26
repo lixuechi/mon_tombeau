@@ -17,7 +17,7 @@ public class ReachGameEndingDenoter : MonoBehaviour {
 
 
 
-		if (this.transform.position.y >= 0) 
+		if (this.transform.position.y >= 1) 
 		{
 			if (++frameCounter >= 90) 
 			{
